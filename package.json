@@ -1,7 +1,7 @@
 {
   "name": "cnode",
   "version": "1.0.0",
-  "description": "",
+  "description": "use egg-swaggerbox to show api swagger for cnodejs.org, koa egg.js swagger",
   "private": true,
   "dependencies": {
     "await-stream-ready": "^1.0.1",
