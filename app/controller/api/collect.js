@@ -9,11 +9,19 @@ const MongoObjectIdSchema = {
   min: 24,
 };
 
+/**
+ * @Controller Collect
+ */
 class CollectController extends Controller {
+  /**
+   * @Summary get favorite topic collection for a user
+   * @Router GET /api/v1/topic_collect/{name}
+   * @Request path string name* user login name
+   * @Response 200 baseListResponse
+   */
   async index() {
     const { ctx, service } = this;
     const name = ctx.params.name;
-
     const user = await service.user.getUserByLoginName(name);
 
     if (!user) {
@@ -50,7 +58,13 @@ class CollectController extends Controller {
       data: topics,
     };
   }
-
+  /**
+   * @Summary add a topic to the topic collect for a user
+   * @Router POST /api/v1/topic_collect/collect
+   * @Request query string accesstoken*
+   * @Request body addTopic2Collect *body topic_id that add to collect
+   * @Response 200 baseResponse
+   */
   async collect() {
     const { ctx, service } = this;
     const topic_id = ctx.request.body.topic_id;
@@ -92,7 +106,13 @@ class CollectController extends Controller {
 
     ctx.body = { success: true };
   }
-
+  /**
+   * @Summary delete a topic from the topic collect for a user
+   * @Router POST /api/v1/topic_collect/de_collect
+   * @Request query string accesstoken*
+   * @Request body addTopic2Collect *body topic_id delete from collect
+   * @Response 200 baseResponse
+   */
   async de_collect() {
     const { ctx, service } = this;
     const topic_id = ctx.request.body.topic_id;

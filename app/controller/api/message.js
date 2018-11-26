@@ -1,15 +1,28 @@
 'use strict';
 
 const Controller = require('egg').Controller;
-
+/**
+ * @Controller Message
+ */
 class MessageController extends Controller {
+  /**
+   * @Summary get message count for a user
+   * @Router GET /api/v1/message/count
+   * @Request query string accesstoken*
+   * @Response 200 baseResponse
+   */
   async count() {
     const { ctx } = this;
     const userId = ctx.request.user._id;
     const count = await ctx.service.message.getMessagesCount(userId);
     ctx.body = { count };
   }
-
+  /**
+   * @Summary mark all messages for a user
+   * @Router POST /api/v1/message/mark_all
+   * @Request query string accesstoken*
+   * @Response 200 baseResponse
+   */
   async markAll() {
     const { ctx } = this;
     const userId = ctx.request.user._id;
@@ -21,6 +34,13 @@ class MessageController extends Controller {
     };
   }
 
+  /**
+   * @Summary mark one message for a user
+   * @Router POST /api/v1/message/mark_one/{msg_id}
+   * @Request query string accesstoken*
+   * @Request path string msg_id*
+   * @Response 200 baseResponse
+   */
   async markOne() {
     const { ctx } = this;
     const messageId = ctx.params.msg_id;
@@ -31,7 +51,13 @@ class MessageController extends Controller {
       marked_msg_id: messageId,
     };
   }
-
+  /**
+   * @Summary get favorite topic collection for a user
+   * @Router GET /api/v1/messages
+   * @Request query string accesstoken*
+   * @Request query boolean mdrender*
+   * @Response 200 baseResponse
+   */
   async list() {
     const { ctx } = this;
     const userId = ctx.request.user._id;

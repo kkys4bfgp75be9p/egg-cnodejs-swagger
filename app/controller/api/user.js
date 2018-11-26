@@ -2,8 +2,16 @@
 
 const Controller = require('egg').Controller;
 const _ = require('lodash');
-
+/**
+ * @Controller User
+ */
 class UserController extends Controller {
+  /**
+   * @Summary get user information
+   * @Router GET /api/v1/user/{loginname}
+   * @Request path string loginname* user login name
+   * @Response 200 baseResponse
+   */
   async show() {
     const { ctx } = this;
     const loginname = ctx.params.loginname;
@@ -36,7 +44,12 @@ class UserController extends Controller {
       data,
     };
   }
-
+  /**
+   * @Summary verify user with access token
+   * @Router POST /api/v1/accesstoken
+   * @Request query string accesstoken*
+   * @Response 200 baseResponse
+   */
   async verify() {
     const { ctx } = this;
     const user = ctx.request.user;

@@ -3,8 +3,19 @@
 const Controller = require('egg').Controller;
 const _ = require('lodash');
 
+/**
+ * @Controller Topic
+ */
 class TopicController extends Controller {
-  async index(ctx) {
+
+  /**
+   * @Summary get all topics
+   * @Router GET /api/v1/topics
+   * @Request query string tab
+   * @Response 200 baseResponse
+   */
+  async index() {
+    const { ctx, service } = this;
     const tab = ctx.query.tab || 'all';
     const mdrender = ctx.query.mdrender !== 'false';
 
@@ -19,7 +30,7 @@ class TopicController extends Controller {
       }
     }
 
-    let topics = await ctx.service.topic.getTopicsByQuery(query,
+    let topics = await service.topic.getTopicsByQuery(query,
       // TODO 修改 eslint 支持在 {} 内使用 ...，栗子：{ sort: '-top -last_reply_at', ...ctx.pagination }
       Object.assign({ sort: '-top -last_reply_at' }, ctx.pagination));
     topics = topics.map(topic => {
@@ -36,7 +47,15 @@ class TopicController extends Controller {
     };
   }
 
-  async create(ctx) {
+  /**
+   * @Summary create a topic
+   * @Router POST /api/v1/topics
+   * @Request query string accesstoken*
+   * @Request body topic *body
+   * @Response 200 baseResponse
+   */
+  async create() {
+    const { ctx, service } = this;
     const all_tabs = ctx.app.config.tabs.map(tab => {
       return tab[ 0 ];
     });
@@ -55,7 +74,7 @@ class TopicController extends Controller {
     const body = ctx.request.body;
 
     // 储存新主题帖
-    const topic = await ctx.service.topic.newAndSave(
+    const topic = await service.topic.newAndSave(
       body.title,
       body.content,
       body.tab,
@@ -63,10 +82,10 @@ class TopicController extends Controller {
     );
 
     // 发帖用户增加积分,增加发表主题数量
-    await ctx.service.user.incrementScoreAndReplyCount(topic.author_id, 5, 1);
+    await service.user.incrementScoreAndReplyCount(topic.author_id, 5, 1);
 
     // 通知被@的用户
-    await ctx.service.at.sendMessageToMentionUsers(
+    await service.at.sendMessageToMentionUsers(
       body.content,
       topic.id,
       ctx.request.user.id
@@ -78,7 +97,14 @@ class TopicController extends Controller {
     };
   }
 
-  async show(ctx) {
+  /**
+   * @Summary get topic with id
+   * @Router GET /api/v1/topic/{id}
+   * @Request path string id*
+   * @Response 200 baseResponse
+   */
+  async show() {
+    const { ctx, service } = this;
     ctx.validate({
       id: {
         type: 'string',
@@ -89,9 +115,9 @@ class TopicController extends Controller {
 
     const topic_id = String(ctx.params.id);
     const mdrender = ctx.query.mdrender !== 'false';
-    const user = await ctx.service.user.getUserByToken(ctx.query.accesstoken);
+    const user = await service.user.getUserByToken(ctx.query.accesstoken);
 
-    let [ topic, author, replies ] = await ctx.service.topic.getFullTopic(topic_id);
+    let [ topic, author, replies ] = await service.topic.getFullTopic(topic_id);
 
     if (!topic) {
       ctx.status = 404;
@@ -105,7 +131,7 @@ class TopicController extends Controller {
     // 增加 visit_count
     topic.visit_count += 1;
     // 写入 DB
-    await ctx.service.topic.incrementVisitCount(topic_id);
+    await service.topic.incrementVisitCount(topic_id);
 
     topic.content = mdrender ? ctx.helper.markdown(topic.content) : topic.content;
     topic.id = topic._id;
@@ -127,7 +153,7 @@ class TopicController extends Controller {
       return reply;
     });
 
-    topic.is_collect = user ? !!await ctx.service.topicCollect.getTopicCollect(
+    topic.is_collect = user ? !!await service.topicCollect.getTopicCollect(
       user.id,
       topic_id
     ) : false;
@@ -138,8 +164,15 @@ class TopicController extends Controller {
     };
   }
 
-  async update(ctx) {
-
+  /**
+   * @Summary update a topic
+   * @Router POST /api/v1/topics/update
+   * @Request query string accesstoken*
+   * @Request body updateTopic *body
+   * @Response 200 baseResponse
+   */
+  async update() {
+    const { ctx, service } = this;
     const all_tabs = ctx.app.config.tabs.map(tab => {
       return tab[ 0 ];
     });
@@ -161,7 +194,7 @@ class TopicController extends Controller {
 
     const body = ctx.request.body;
 
-    let { topic } = await ctx.service.topic.getTopicById(body.topic_id);
+    let { topic } = await service.topic.getTopicById(body.topic_id);
     if (!topic) {
       ctx.status = 404;
       ctx.body = { success: false, error_msg: '此话题不存在或已被删除。' };
@@ -184,7 +217,7 @@ class TopicController extends Controller {
     await topic.save();
 
     // 通知被 @ 的人
-    await ctx.service.at.sendMessageToMentionUsers(
+    await service.at.sendMessageToMentionUsers(
       topic.content,
       topic.id,
       ctx.request.user.id

@@ -48,3 +48,8 @@ exports.routerPlus = {
   enable: true,
   package: 'egg-router-plus',
 };
+
+exports.swaggerbox = {
+  enable: true,
+  package: 'egg-swaggerbox',
+};

@@ -1,13 +1,23 @@
 'use strict';
 
 const Controller = require('egg').Controller;
-
+/**
+ * @Controller Reply
+ */
 const MongoObjectIdSchema = {
   type: 'string',
   format: /^[0-9a-f]{24}$/i,
 };
 
 class ReplyController extends Controller {
+  /**
+   * @Summary mark one message for a user
+   * @Router POST /api/v1/topic/{topic_id}/replies
+   * @Request query string accesstoken*
+   * @Request path string topic_id*
+   * @Request body reply *body
+   * @Response 200 baseResponse
+   */
   async create() {
     const { ctx } = this;
     ctx.validate({
@@ -67,7 +77,13 @@ class ReplyController extends Controller {
       reply_id: reply._id,
     };
   }
-
+  /**
+   * @Summary mark one message for a user
+   * @Router POST /api/v1/reply/{reply_id}/ups
+   * @Request query string accesstoken*
+   * @Request path string reply_id*
+   * @Response 200 baseResponse
+   */
   async updateUps() {
     const { ctx } = this;
     ctx.validate({
