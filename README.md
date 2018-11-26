@@ -4,4 +4,12 @@ egg.js cnodejs.org koa swagger
 
 use [egg-swaggerbox](https://github.com/okoala/egg-swaggerbox) to show api for egg-cnodejs
 
+## how to start swagger ui
+
+- npm i
+
+- npm run dev
+
+- open http://127.0.0.1:7001/swagger-ui.html
+
  
